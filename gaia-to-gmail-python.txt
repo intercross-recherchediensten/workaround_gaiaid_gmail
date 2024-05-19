@@ -1,0 +1,111 @@
+from itertools import permutations
+
+full_firstname = input("Enter your first name: ")
+full_middlename = input("Enter your middle name (leave empty if none): ")
+full_lastname = input("Enter your last name: ")
+number_input = input("Enter your year of birth (leave empty if none): ")
+
+# Function to split the year into the last two digits
+def split_year(year):
+    return year % 100
+
+# Validate and handle the year of birth input
+if number_input:
+  if int(number_input) > 1900:
+    numberlist = [int(number_input), split_year(int(number_input))]
+  else:
+    numberlist = [int(number_input)]
+else:
+    # If no number is provided, suggest a range from 1 to 99
+    numberlist = list(range(1, 100))
+
+
+# Determine possible characters for initial_middlename
+if full_middlename:
+    initial_middlename = full_middlename[0]
+else:
+    # If there's no middle name, full_middlename becomes "" and initial_middlename wil be a list of 'a' to 'z'
+    full_middlename = ""
+    initial_middlename = ""
+    alfabet = 'abcdefghijklmnopqrstuvwxyz'
+
+initial_firstname = full_firstname[0]
+initial_lastname = full_lastname[0]
+
+all_permutations = []
+
+# Generate permutations of lengths 1 to 4 when middle name has been given by the user
+if full_middlename:
+  for x in numberlist:
+    number = x
+    elements = [full_firstname, full_middlename, full_lastname, initial_firstname, initial_middlename, initial_lastname, str(number)]
+    for r in range(1, 5):
+          for perm in permutations(elements, r):
+              # Check if 'number' is in the combination and in the last position
+              if str(number) not in perm or perm[-1] == str(number):
+                  # Check multiple rules within a single block
+                  if not (
+                      (full_middlename in perm and full_firstname in perm and perm.index(full_middlename) < perm.index(full_firstname)) or
+                      (full_middlename in perm and initial_firstname in perm and perm.index(full_middlename) < perm.index(initial_firstname)) or
+                      (initial_middlename in perm and full_firstname in perm and perm.index(initial_middlename) < perm.index(full_firstname)) or
+                      (initial_middlename in perm and initial_firstname in perm and perm.index(initial_middlename) < perm.index(initial_firstname)) or
+                      (full_firstname in perm and initial_firstname in perm) or
+                      (full_middlename in perm and initial_middlename in perm) or
+                      (full_lastname in perm and initial_lastname in perm) or
+                      (full_firstname in perm and full_middlename in perm and perm.index(full_firstname) + 1 != perm.index(full_middlename)) or
+                      (full_firstname in perm and initial_middlename in perm and perm.index(full_firstname) + 1 != perm.index(initial_middlename)) or
+                      (initial_firstname in perm and full_middlename in perm and perm.index(initial_firstname) + 1 != perm.index(full_middlename)) or
+                      (initial_firstname in perm and initial_middlename in perm and perm.index(initial_firstname) + 1 != perm.index(initial_middlename))
+                 ):
+                      all_permutations.append(''.join(perm))
+
+# Generate permutations of lengths 1 to 4 when middle name has NOT been given by the user
+if not full_middlename:
+  for letter in alfabet:
+    initial_middlename = letter
+    for x in numberlist:
+      number = x
+      elements = [full_firstname, full_middlename, full_lastname, initial_firstname, initial_middlename, initial_lastname, str(number)]
+      for r in range(1, 5):
+          for perm in permutations(elements, r):
+              # Check if 'number' is in the combination and in the last position
+              if str(number) not in perm or perm[-1] == str(number):
+                  # Check multiple rules within a single block
+                  if not (
+                      (full_middlename in perm and full_firstname in perm and perm.index(full_middlename) < perm.index(full_firstname)) or
+                      (full_middlename in perm and initial_firstname in perm and perm.index(full_middlename) < perm.index(initial_firstname)) or
+                      (initial_middlename in perm and full_firstname in perm and perm.index(initial_middlename) < perm.index(full_firstname)) or
+                      (initial_middlename in perm and initial_firstname in perm and perm.index(initial_middlename) < perm.index(initial_firstname)) or
+                      (full_firstname in perm and initial_firstname in perm) or
+                      (full_middlename in perm and initial_middlename in perm) or
+                      (full_lastname in perm and initial_lastname in perm) or
+                      (full_firstname in perm and full_middlename in perm and perm.index(full_firstname) + 1 != perm.index(full_middlename)) or
+                      (full_firstname in perm and initial_middlename in perm and perm.index(full_firstname) + 1 != perm.index(initial_middlename)) or
+                      (initial_firstname in perm and full_middlename in perm and perm.index(initial_firstname) + 1 != perm.index(full_middlename)) or
+                      (initial_firstname in perm and initial_middlename in perm and perm.index(initial_firstname) + 1 != perm.index(initial_middlename))
+                  ):
+                      all_permutations.append(''.join(perm))
+
+
+# Sort the list alphabetically
+all_permutations = sorted(set(all_permutations))
+
+# remove numbers out of the list
+all_permutations = [item for item in all_permutations if not item.isdigit()]
+
+# add @gmail.com to every combination
+all_permutations = [item + "@gmail.com" for item in all_permutations]
+
+# Specify the file path
+file_path = "output-email.txt"
+
+# Write the modified list to the text file
+with open(file_path, 'w') as file:
+    for item in all_permutations:
+        file.write(item + '\n')
+
+print(f"Data has been saved to {file_path}")
+
+# Print all permutations
+for perm in all_permutations:
+    print(perm)
